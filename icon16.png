@@ -1,0 +1,40 @@
+$dir = "gold-dollar-extension"
+if (Test-Path $dir) { Remove-Item -Recurse -Force $dir }
+New-Item -ItemType Directory -Path $dir | Out-Null
+
+# 1. manifest.json
+@'
+{
+  "manifest_version": 3,
+  "name": "ئالتۇن دۇللار باھاسى",
+  "version": "1.2.0",
+  "description": "خەلقئارالىق ئالتۇن، دوللار ۋە سۈرىيە رەسمىي پۇل كۆرسەتكۈچىنىڭ كۈندىلىك ئەھۋالى.",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ئالتۇن دۇللار باھاسى",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["bg.png", "icon.png"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';"
+  }
+}
+'@ | Out-File -FilePath "$dir\manifest.json" -Encoding utf8
+
+# 2. icon.png ۋە bg.png ھاسىل قىلىش (PNG Base64)
+$iconBase64 = "iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAAP1BMVEUAAAD5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX5nhX/W2xXAAAAFHRSTlMA9fv9+v359vX18/Hu7Orq4ODc1825B3YAAAC6SURBVHic7dxBDsMgDATAIZgQyv8/to16aIsidVv1zJFlA5I/mU2SpEmTpn0f48p53VvY/jPq4x8y7y1s/xlt+x/q45+y7y1s/xl9/A/18Q+Z7S1s/xmT/0B9/ANmeAvbf8Y0gBv+63x7C9t/xvQ/1Me/7F27t7D9Z1z+A/XxD1jtLWz/GfsA1Mc/s/Z/a9r/mOktbPd/yvYWtvuP2d7Cdv9721vY7t/Q3sJ2/55/AGj3jV0vT3BPAAAAAElFTkSuQmCC"
+[System.IO.File]::WriteAllBytes("$dir\icon.png", [System.Convert]::FromBase64String($iconBase64))
+[System.IO.File]::WriteAllBytes("$dir\bg.png", [System.Convert]::FromBase64String($iconBase64))
+
+# 3. zip ھۆججەت چىقىرىش
+Compress-Archive -Path "$dir\*" -DestinationPath "gold-dollar-extension.zip" -Force
+Write-Host "تەييار بولدى! gold-dollar-extension.zip ھۆججىتى پۈتتى." -ForegroundColor Green

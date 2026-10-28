@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "ئالتۇن دۇللار باھاسى",
+  "version": "1.3.0",
+  "description": "خەلقئارالىق ئالتۇن، دوللار ۋە سۈرىيە رەسمىي پۇل كۆرسەتكۈچىنىڭ كۈندىلىك ئەھۋالى.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ئالتۇن دۇللار باھاسى",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';"
+  }
+}
