@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="ug" dir="rtl" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ئەلىشىر بايان — داڭلىق توربەت لايىھەلىگۈچى ۋە UI/UX ئۇستىسى</title>
+  
+  <!-- Fonts: Google Fonts (Cairo & Outfit) with Uyghur Arabic fallback fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"UKIJ Tuz"', '"Microsoft Uighur"', '"ALKATIP Basma"', 'Cairo', 'sans-serif'],
+            display: ['"UKIJ Tuz"', '"Microsoft Uighur"', 'Cairo', 'sans-serif'],
+          },
+          colors: {
+            etblue: {
+              300: '#5ac8fa',
+              400: '#2db5ff',
+              500: '#0099FF', // Kök Bayraq Azure Blue
+              600: '#007ad6',
+              glow: 'rgba(0, 153, 255, 0.45)'
+            },
+            dark: {
+              base: '#05070d',
+              card: 'rgba(11, 18, 32, 0.72)',
+              border: 'rgba(0, 153, 255, 0.15)'
+            }
+          },
+          animation: {
+            'glow-pulse': 'glowPulse 4s ease-in-out infinite',
+            'spin-slow': 'spin 22s linear infinite',
+            'float-smooth': 'floating 5s ease-in-out infinite',
+            'dash-rotate': 'dashTracer 9s linear infinite',
+          },
+          keyframes: {
+            glowPulse: {
+              '0%, 100%': { opacity: '0.35', transform: 'scale(1)' },
+              '50%': { opacity: '0.8', transform: 'scale(1.08)' }
+            },
+            floating: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-12px)' }
+            },
+            dashTracer: {
+              '0%': { strokeDashoffset: '1400' },
+              '100%': { strokeDashoffset: '0' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Uyghur Typography Tuning */
+    body {
+      background-color: #04060a;
+      color: #e2e8f0;
+      overflow-x: hidden;
+      font-family: "UKIJ Tuz", "Microsoft Uighur", "ALKATIP Basma", "Cairo", sans-serif;
+      line-height: 1.8;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      line-height: 1.45;
+    }
+
+    /* Ambient Kök Bayraq subtle background motif */
+    .flag-ambient-bg {
+      background: radial-gradient(circle at 50% 20%, rgba(0, 153, 255, 0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 80% 80%, rgba(0, 110, 210, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 20% 60%, rgba(255, 255, 255, 0.03) 0%, transparent 40%);
+    }
+
+    /* Glassmorphic Panels */
+    .glass-nav {
+      background: rgba(5, 8, 15, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(0, 153, 255, 0.18);
+    }
+
+    .glass-card {
+      background: rgba(10, 17, 30, 0.7);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 153, 255, 0.16);
+      box-shadow: 0 10px 35px -10px rgba(0, 0, 0, 0.6);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:hover {
+      border-color: rgba(0, 153, 255, 0.55);
+      box-shadow: 0 16px 40px -10px rgba(0, 153, 255, 0.3);
+      transform: translateY(-5px);
+    }
+
+    .glass-badge {
+      background: rgba(0, 153, 255, 0.08);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 153, 255, 0.25);
+    }
+
+    /* Gradient texts */
+    .gradient-blue-text {
+      background: linear-gradient(135deg, #ffffff 10%, #70c7ff 50%, #0099ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Glowing Border Tracer for Map */
+    .map-path-track {
+      stroke: rgba(0, 153, 255, 0.22);
+      stroke-width: 3;
+      fill: rgba(0, 153, 255, 0.03);
+      filter: drop-shadow(0 0 10px rgba(0, 153, 255, 0.15));
+    }
+
+    .map-path-laser {
+      stroke: #00e1ff;
+      stroke-width: 3.5;
+      stroke-linecap: round;
+      stroke-dasharray: 120 400;
+      animation: dashTracer 7s linear infinite;
+      filter: drop-shadow(0 0 12px #00d4ff) drop-shadow(0 0 25px #0099ff);
+    }
+
+    .map-path-laser-reverse {
+      stroke: #ffffff;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-dasharray: 80 500;
+      animation: dashTracerReverse 10s linear infinite;
+      filter: drop-shadow(0 0 10px #ffffff);
+    }
+
+    @keyframes dashTracerReverse {
+      0% { strokeDashoffset: -1400; }
+      100% { strokeDashoffset: 0; }
+    }
+
+    /* Grid Texture */
+    .bg-cyber-grid {
+      background-size: 45px 45px;
+      background-image: 
+        linear-gradient(to right, rgba(0, 153, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0, 153, 255, 0.03) 1px, transparent 1px);
+    }
+
+    /* Smooth Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #04060a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #112845;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0099FF;
+    }
+  </style>
+</head>
+<body class="selection:bg-etblue-500 selection:text-white bg-cyber-grid flag-ambient-bg relative">
+
+  <!-- Ambient Glowing Background Spheres & Turkistan Flag Crescent Watermark -->
+  <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+    <!-- Blue Glow Orb top-right -->
+    <div class="absolute top-[-10%] right-[-5%] w-[650px] h-[650px] bg-etblue-500/20 rounded-full blur-[160px] animate-glow-pulse"></div>
+    <!-- Deep Glow Orb bottom-left -->
+    <div class="absolute bottom-[-15%] left-[-10%] w-[600px] h-[600px] bg-[#0055b3]/25 rounded-full blur-[180px] animate-glow-pulse" style="animation-delay: 2s;"></div>
+    
+    <!-- Stylized Subtle Crescent & Star Watermark in Background -->
+    <div class="absolute top-[18%] left-[8%] opacity-[0.06] transform -rotate-12 select-none">
+      <svg width="480" height="480" viewBox="0 0 100 100" fill="white">
+        <!-- Crescent -->
+        <path d="M50,15 A35,35 0 1,0 85,50 A28,28 0 1,1 50,15 Z" />
+        <!-- 5-Pointed Star -->
+        <polygon points="76,46 80,48 78,52 82,54 78,57 79,61 75,59 72,62 73,57 69,55 74,53 73,48 76,51" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- NAVIGATION BAR (RTL) -->
+  <header class="fixed top-0 left-0 w-full z-50 glass-nav transition-all duration-300" id="mainHeader">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo / Emblem with Kök Bayraq Colors -->
+      <a href="#hero" class="flex items-center gap-3.5 group">
+        <div class="relative w-11 h-11 rounded-2xl bg-gradient-to-tr from-etblue-600 to-sky-300 p-[2px] transition-transform duration-300 group-hover:scale-105 shadow-lg shadow-etblue-500/25">
+          <div class="w-full h-full bg-[#070c17] rounded-[14px] flex items-center justify-center relative overflow-hidden">
+            <!-- Mini Crescent & Star -->
+            <svg class="w-6 h-6 text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]" viewBox="0 0 100 100" fill="currentColor">
+              <path d="M42,20 A30,30 0 1,0 72,50 A24,24 0 1,1 42,20 Z" />
+              <polygon points="68,43 72,46 70,50 75,52 70,55 71,59 67,57 64,60 65,55 60,53 65,51 64,46 67,49" />
+            </svg>
+          </div>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-bold tracking-wide text-white group-hover:text-etblue-400 transition-colors font-display">ئەلىشىر بايان</span>
+          <span class="text-[11px] text-etblue-300/80 font-medium tracking-wider">ئالىي دەرىجىلىك توربەت لايىھەلىگۈچى</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Items -->
+      <nav class="hidden md:flex items-center space-x-1 space-x-reverse">
+        <a href="#hero" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-etblue-500/10 rounded-full transition-all">باش بەت</a>
+        <a href="#services" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-etblue-500/10 rounded-full transition-all">مۇلازىمەتلەر</a>
+        <a href="#mapSection" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-etblue-500/10 rounded-full transition-all">خەرىتە & نۇر</a>
+        <a href="#portfolio" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-etblue-500/10 rounded-full transition-all">تۈرلەر</a>
+        <a href="#skills" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-etblue-500/10 rounded-full transition-all">ماھارەت</a>
+        <a href="#about" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-etblue-500/10 rounded-full transition-all">مەن ھەققىدە</a>
+      </nav>
+
+      <!-- CTA & Mobile Toggle -->
+      <div class="flex items-center gap-4">
+        <a href="#contact" class="hidden sm:inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-etblue-600 via-etblue-500 to-sky-400 hover:opacity-95 shadow-lg shadow-etblue-500/35 transition-all transform hover:-translate-y-0.5 active:translate-y-0">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span>ھەمكارلىشايلى</span>
+        </a>
+
+        <!-- Mobile Menu Toggle Button -->
+        <button id="mobileMenuBtn" aria-label="تىزىملىكنى ئېچىش" class="md:hidden w-11 h-11 rounded-xl glass-badge flex items-center justify-center text-slate-200 hover:text-white focus:outline-none">
+          <i class="fa-solid fa-bars text-lg" id="menuIcon"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div id="mobileDrawer" class="hidden md:hidden px-6 pt-3 pb-6 border-b border-etblue-500/20 bg-[#070c17]/95 backdrop-blur-2xl transition-all duration-300">
+      <div class="flex flex-col space-y-3 text-right">
+        <a href="#hero" class="mobile-link py-2 text-slate-200 hover:text-etblue-400 text-base font-medium">باش بەت</a>
+        <a href="#services" class="mobile-link py-2 text-slate-200 hover:text-etblue-400 text-base font-medium">مۇلازىمەتلەر</a>
+        <a href="#mapSection" class="mobile-link py-2 text-slate-200 hover:text-etblue-400 text-base font-medium">خەرىتە & نۇر ئېففېكتى</a>
+        <a href="#portfolio" class="mobile-link py-2 text-slate-200 hover:text-etblue-400 text-base font-medium">تاللانغان تۈرلەر</a>
+        <a href="#skills" class="mobile-link py-2 text-slate-200 hover:text-etblue-400 text-base font-medium">ماھارەت ۋە تېخنىكىلار</a>
+        <a href="#about" class="mobile-link py-2 text-slate-200 hover:text-etblue-400 text-base font-medium">مەن ھەققىدە</a>
+        <a href="#contact" class="mobile-link mt-2 inline-flex justify-center items-center gap-2 py-3 rounded-xl text-sm font-bold text-white bg-etblue-600 hover:bg-etblue-500 shadow-lg shadow-etblue-500/30">
+          ئالاقىلىشىش <i class="fa-solid fa-arrow-left text-xs"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section id="hero" class="relative min-h-screen pt-32 pb-20 flex items-center justify-center overflow-hidden">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 w-full">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+          
+          <!-- Hero Text (RTL) -->
+          <div class="lg:col-span-7 space-y-6 text-center lg:text-right">
+            
+            <!-- Live Availability Pill with East Turkistan Blue Accent -->
+            <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass-badge text-xs sm:text-sm font-semibold text-etblue-300">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 -mr-5"></span>
+              <span>ھازىر يېڭى يۇقىرى تېخنىكىلىق تۈرلەرنى قوبۇل قىلىمەن</span>
+            </div>
+
+            <!-- Headline with Uyghur Modern Style -->
+            <h1 class="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-normal leading-[1.3] text-white">
+              زامانىۋى لايىھە بىلەن <br class="hidden sm:block"/>
+              <span class="gradient-blue-text">تەڭداشسىز تور كەچۈرمىشى</span> بەرپا قىلىمەن
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="text-slate-300 text-base sm:text-lg md:text-xl font-normal max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+              سالام! مەن ئەلىشىر بايان — كۆك بايراقتەك يۈكسەك غايە ۋە زامانىۋى كود ئارقىلىق دۇنيا سەۋىيەسىدىكى سۈپەتلىك، تېز سۈرئەتلىك ۋە تەسىر كۈچى يۇقىرى تور بېكەت ھەم كۆرۈنمە يۈزلەرنى پۈتتۈرىمەن.
+            </p>
+
+            <!-- Action Buttons -->
+            <div class="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-4">
+              <a href="#portfolio" class="px-8 py-3.5 rounded-full text-base font-bold text-white bg-gradient-to-r from-etblue-600 to-sky-400 hover:opacity-95 shadow-xl shadow-etblue-500/30 transition-all transform hover:-translate-y-1 inline-flex items-center gap-3">
+                <span>ئىجادىيەتلىرىمنى كۆرۈڭ</span>
+                <i class="fa-solid fa-arrow-left text-xs"></i>
+              </a>
+              <a href="#contact" class="px-8 py-3.5 rounded-full text-base font-semibold text-slate-200 glass-badge hover:bg-etblue-500/20 hover:text-white transition-all inline-flex items-center gap-2">
+                <span>تەكلىپ قويۇش</span>
+                <i class="fa-regular fa-comment-dots text-sm"></i>
+              </a>
+            </div>
+
+            <!-- Metrics -->
+            <div class="pt-8 grid grid-cols-3 gap-4 border-t border-etblue-500/20 max-w-lg mx-auto lg:mx-0 text-center">
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-white">8+</h3>
+                <p class="text-xs text-slate-400 font-medium">يىللىق لايىھە تەجرىبىسى</p>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-etblue-400">70+</h3>
+                <p class="text-xs text-slate-400 font-medium">مۇۋەپپەقىيەتلىك تۈر</p>
+              </div>
+              <div>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-white">100%</h3>
+                <p class="text-xs text-slate-400 font-medium">ئەلا خېرىدار باھاسى</p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hero Graphic: Turkistan Vector Emblem with Glowing Rays -->
+          <div class="lg:col-span-5 flex justify-center relative">
+            <div class="relative w-full max-w-md aspect-square flex items-center justify-center">
+              
+              <!-- Radiant Circular Pulsing Glow -->
+              <div class="absolute w-72 h-72 bg-etblue-500/25 rounded-full blur-3xl animate-glow-pulse"></div>
+
+              <!-- Main Floating Interactive Card -->
+              <div class="relative z-10 w-80 sm:w-96 glass-card p-6 rounded-3xl border border-etblue-500/30 animate-float-smooth">
+                <div class="flex items-center justify-between pb-4 border-b border-etblue-500/15">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                    <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                  </div>
+                  <span class="text-xs font-mono text-etblue-300">Uyghur_Creative.ui</span>
+                </div>
+
+                <!-- Showcase inside hero card with Flag Identity -->
+                <div class="mt-5 space-y-4">
+                  <div class="h-36 rounded-2xl bg-gradient-to-bl from-[#003d73] via-[#051a33] to-[#040813] p-5 flex flex-col justify-between border border-etblue-500/30 relative overflow-hidden">
+                    <div class="flex justify-between items-center z-10">
+                      <span class="px-2.5 py-1 rounded-md bg-white/10 text-[11px] font-bold text-white">ئۇيغۇر تەتقىقاتى & كود</span>
+                      <i class="fa-solid fa-code text-etblue-400"></i>
+                    </div>
+
+                    <!-- Crescent & Star in the card banner -->
+                    <div class="flex items-center gap-3 z-10">
+                      <svg class="w-8 h-8 text-white filter drop-shadow" viewBox="0 0 100 100" fill="currentColor">
+                        <path d="M40,20 A30,30 0 1,0 70,50 A24,24 0 1,1 40,20 Z" />
+                        <polygon points="68,43 72,46 70,50 75,52 70,55 71,59 67,57 64,60 65,55 60,53 65,51 64,46 67,49" />
+                      </svg>
+                      <div>
+                        <div class="text-sm font-bold text-white">شەرقىي تۈركىستان كۆك بايرىقى</div>
+                        <div class="text-[11px] text-sky-200/80">#0099FF رەڭ تەگلىك ۋە نۇر ئېففېكتى</div>
+                      </div>
+                    </div>
+
+                    <!-- Background abstract glow -->
+                    <div class="absolute -left-6 -bottom-6 w-28 h-28 bg-etblue-500/40 rounded-full blur-xl"></div>
+                  </div>
+
+                  <!-- Quick Stats -->
+                  <div class="grid grid-cols-2 gap-3 text-right">
+                    <div class="p-3 rounded-xl bg-etblue-950/40 border border-etblue-500/20">
+                      <div class="text-[11px] text-slate-300">يۈكلىنىش سۈرئىتى</div>
+                      <div class="text-xl font-bold text-emerald-400 mt-1 font-mono">0.4 سېكۇنت</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-etblue-950/40 border border-etblue-500/20">
+                      <div class="text-[11px] text-slate-300">ماسلىشىشچانلىقى</div>
+                      <div class="text-xl font-bold text-etblue-400 mt-1 font-mono">100% تولۇق</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Floating Satellites -->
+              <div class="absolute -top-3 -right-2 sm:-right-6 glass-card px-4 py-2 rounded-2xl flex items-center gap-3 z-20 border border-etblue-500/40">
+                <div class="w-9 h-9 rounded-xl bg-etblue-500/20 text-etblue-400 flex items-center justify-center font-bold">
+                  <i class="fa-solid fa-bezier-curve"></i>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs font-bold text-white">Figma & UI</div>
+                  <div class="text-[10px] text-slate-400">لايىھە سىستېمىسى</div>
+                </div>
+              </div>
+
+              <div class="absolute -bottom-4 -left-2 sm:-left-4 glass-card px-4 py-2 rounded-2xl flex items-center gap-3 z-20 border border-etblue-500/40">
+                <div class="w-9 h-9 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs font-bold text-white">نۇر ئېففېكتى</div>
+                  <div class="text-[10px] text-slate-400">Neon Tracer</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- NEW SPECIAL FEATURE: MAP WITH GLOWING ROTATING BORDER TRACER (خەرىتە ۋە ئايلانما نۇر گىرۋىكى) -->
+    <section id="mapSection" class="py-24 relative border-t border-etblue-500/20 bg-[#060b14]/70">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full glass-badge text-xs font-semibold text-etblue-400 mb-3">
+            <i class="fa-solid fa-earth-asia"></i>
+            <span>جۇغراپىيىلىك خەرىتە & نۇر ئېففېكتى</span>
+          </div>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white">
+            شەرقىي تۈركىستان خەرىتىسى گىرۋىكىدىكى سېھرىي نۇر
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base mt-4 leading-relaxed">
+            تۆۋەندىكى ۋېكتورلۇق خەرىتە تاشقى سىزىقلىرى بويىچە يۇقىرى تېخنىكىلىق نېئون نۇر تالالىرى (Neon Border Tracers) ۋە كۆك بايراقتىكى ئاي-يۇلتۇز مەركەزگە مۇجەسسەملەنگەن بولۇپ، ھەرىكەتلىك نۇر دائىملىق ئايلىنىپ تۇرىدۇ.
+          </p>
+        </div>
+
+        <div class="relative max-w-4xl mx-auto glass-card p-6 sm:p-10 rounded-3xl border-2 border-etblue-500/40 shadow-2xl shadow-etblue-500/20 overflow-hidden">
+          
+          <!-- Background radial glow inside the map box -->
+          <div class="absolute inset-0 bg-gradient-to-b from-etblue-500/10 via-transparent to-etblue-500/5 pointer-events-none"></div>
+
+          <!-- Top Status Bar of Interactive Map -->
+          <div class="flex flex-wrap items-center justify-between pb-6 mb-6 border-b border-etblue-500/20 gap-4">
+            <div class="flex items-center gap-3">
+              <span class="w-3.5 h-3.5 rounded-full bg-cyan-400 animate-pulse"></span>
+              <span class="text-sm font-bold text-white tracking-wide">شەرقىي تۈركىستان زېمىنى — كۆك بايراق نۇرى</span>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-mono text-etblue-300">
+              <span class="bg-etblue-500/20 px-3 py-1 rounded-lg border border-etblue-500/30">1,828,418 km²</span>
+              <span class="bg-etblue-500/20 px-3 py-1 rounded-lg border border-etblue-500/30">LAT: 35°–49° N</span>
+            </div>
+          </div>
+
+          <!-- SVG MAP CONTAINER WITH GLOWING BORDER TRACERS -->
+          <div class="relative w-full aspect-[16/9] sm:aspect-[21/10] flex items-center justify-center">
+            
+            <svg viewBox="0 0 1000 560" class="w-full h-full filter drop-shadow-[0_0_20px_rgba(0,153,255,0.4)]">
+              <defs>
+                <!-- Neon Blue Glow Filter -->
+                <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="6" result="blur1" />
+                  <feGaussianBlur stdDeviation="16" result="blur2" />
+                  <feMerge>
+                    <feMergeNode in="blur2" />
+                    <feMergeNode in="blur1" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+                
+                <!-- Linear Gradient for Map Filling -->
+                <linearGradient id="mapGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#005299" stop-opacity="0.35" />
+                  <stop offset="50%" stop-color="#007acc" stop-opacity="0.2" />
+                  <stop offset="100%" stop-color="#002b4d" stop-opacity="0.4" />
+                </linearGradient>
+              </defs>
+
+              <!-- Stylized East Turkistan Map Outline Path -->
+              <!-- Layer 1: Base Map Fill & Shadow -->
+              <path 
+                id="turkistanMapBase"
+                class="map-path-track"
+                fill="url(#mapGradient)"
+                d="M 170,300 
+                   C 190,260 210,240 240,210 
+                   C 260,190 290,165 330,150 
+                   C 380,130 420,120 470,110 
+                   C 520,100 570,80 630,70 
+                   C 680,60 740,75 790,100 
+                   C 830,120 870,150 890,190 
+                   C 910,230 895,270 880,300 
+                   C 860,340 840,370 820,395 
+                   C 780,430 730,460 670,480 
+                   C 600,500 520,510 440,495 
+                   C 370,480 320,460 270,430 
+                   C 220,400 180,360 160,335 
+                   Z"
+              />
+
+              <!-- Layer 2: Main Cyan-Blue Neon Light Tracer (Clockwise Edge Rotation) -->
+              <path 
+                class="map-path-laser"
+                fill="none"
+                d="M 170,300 
+                   C 190,260 210,240 240,210 
+                   C 260,190 290,165 330,150 
+                   C 380,130 420,120 470,110 
+                   C 520,100 570,80 630,70 
+                   C 680,60 740,75 790,100 
+                   C 830,120 870,150 890,190 
+                   C 910,230 895,270 880,300 
+                   C 860,340 840,370 820,395 
+                   C 780,430 730,460 670,480 
+                   C 600,500 520,510 440,495 
+                   C 370,480 320,460 270,430 
+                   C 220,400 180,360 160,335 
+                   Z"
+              />
+
+              <!-- Layer 3: Secondary White Laser Pulse (Counter Rotating Edge Highlight) -->
+              <path 
+                class="map-path-laser-reverse"
+                fill="none"
+                d="M 170,300 
+                   C 190,260 210,240 240,210 
+                   C 260,190 290,165 330,150 
+                   C 380,130 420,120 470,110 
+                   C 520,100 570,80 630,70 
+                   C 680,60 740,75 790,100 
+                   C 830,120 870,150 890,190 
+                   C 910,230 895,270 880,300 
+                   C 860,340 840,370 820,395 
+                   C 780,430 730,460 670,480 
+                   C 600,500 520,510 440,495 
+                   C 370,480 320,460 270,430 
+                   C 220,400 180,360 160,335 
+                   Z"
+              />
+
+              <!-- Central Kök Bayraq Moon and Star Inside Map Center -->
+              <g transform="translate(480, 270) scale(1.1)" class="filter drop-shadow-[0_0_15px_rgba(255,255,255,0.9)]">
+                <!-- Glowing Crescent -->
+                <path d="M-30,-50 A50,50 0 1,0 30,10 A40,40 0 1,1 -30,-50 Z" fill="#ffffff" />
+                <!-- 5-Point Star -->
+                <polygon points="28,-15 36,-10 32,0 40,4 32,9 35,18 26,13 20,20 20,10 12,6 21,3 19,-6" fill="#ffffff" />
+              </g>
+
+              <!-- Major City Interactive Coordinate Nodes with Radar Pulses -->
+              <!-- Urumqi -->
+              <g transform="translate(680, 210)" class="cursor-pointer group">
+                <circle r="12" fill="rgba(0,153,255,0.2)" class="animate-ping" />
+                <circle r="5" fill="#00e1ff" />
+                <text x="14" y="5" fill="#ffffff" font-size="16" font-family="'Cairo', sans-serif" font-weight="bold">ئۈرۈمچى</text>
+              </g>
+
+              <!-- Kashgar -->
+              <g transform="translate(260, 380)" class="cursor-pointer group">
+                <circle r="12" fill="rgba(0,153,255,0.2)" class="animate-ping" style="animation-delay: 1s;" />
+                <circle r="5" fill="#00e1ff" />
+                <text x="14" y="5" fill="#ffffff" font-size="16" font-family="'Cairo', sans-serif" font-weight="bold">قەشقەر</text>
+              </g>
+
+              <!-- Ghulja / Ili -->
+              <g transform="translate(380, 210)" class="cursor-pointer group">
+                <circle r="12" fill="rgba(0,153,255,0.2)" class="animate-ping" style="animation-delay: 1.5s;" />
+                <circle r="5" fill="#00e1ff" />
+                <text x="14" y="5" fill="#ffffff" font-size="16" font-family="'Cairo', sans-serif" font-weight="bold">غۇلجا</text>
+              </g>
+
+              <!-- Hotan -->
+              <g transform="translate(420, 440)" class="cursor-pointer group">
+                <circle r="10" fill="rgba(0,153,255,0.2)" class="animate-ping" style="animation-delay: 2s;" />
+                <circle r="5" fill="#00e1ff" />
+                <text x="14" y="5" fill="#ffffff" font-size="16" font-family="'Cairo', sans-serif" font-weight="bold">خوتەن</text>
+              </g>
+
+              <!-- Kumul -->
+              <g transform="translate(820, 260)" class="cursor-pointer group">
+                <circle r="10" fill="rgba(0,153,255,0.2)" class="animate-ping" style="animation-delay: 2.5s;" />
+                <circle r="5" fill="#00e1ff" />
+                <text x="14" y="5" fill="#ffffff" font-size="16" font-family="'Cairo', sans-serif" font-weight="bold">قۇمۇل</text>
+              </g>
+            </svg>
+
+          </div>
+
+          <!-- Map Footnote / Tech Details -->
+          <div class="mt-6 pt-4 border-t border-etblue-500/20 flex flex-wrap items-center justify-between text-xs text-slate-400 gap-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-microchip text-etblue-400"></i>
+              <span>ھەرىكەتچان SVG سىزىق كودى ۋە ئەينەكسىمان نۇر قەۋىتى ئارقىلىق رېندىرلانغان</span>
+            </div>
+            <div class="flex items-center gap-2 text-cyan-300">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>نۇرنىڭ گىرۋەكتىن ئايلىنىش تېزلىكى: 7 سېكۇنت / دەۋرىيلىك</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SERVICES SECTION (مۇلازىمەتلەر) -->
+    <section id="services" class="py-24 relative border-t border-etblue-500/15">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <span class="text-xs font-bold uppercase tracking-widest text-etblue-400">مۇلازىمەت ساھەلىرىم</span>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mt-2">
+            ئەڭ ئالىي لايىھە ۋە تور قۇرۇلۇشى
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base mt-4">
+            ئۇيغۇرچە يېزىق ئۇسلۇبىنىڭ گۈزەللىكىنى دۇنياۋى يۇقىرى تېخنىكا بىلەن بىرلەشتۈرۈپ رەقەملىك دۇنيادا يېڭى پەللە يارىتىمىز.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Card 1 -->
+          <div class="glass-card p-8 rounded-3xl flex flex-col justify-between group">
+            <div>
+              <div class="w-14 h-14 rounded-2xl bg-etblue-500/15 border border-etblue-500/30 text-etblue-400 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-etblue-500 group-hover:text-white transition-all duration-300 shadow-lg shadow-etblue-500/20">
+                <i class="fa-solid fa-palette"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mt-6 group-hover:text-etblue-400 transition-colors">UI / UX كۆرۈنمە يۈز</h3>
+              <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+                Figma ئارقىلىق پۈتۈنلەي RTL (ئوڭدىن سولغا) خاسلاشتۇرۇلغان، تەرتىپلىك، زامانىۋى ۋە خېرىدارنى جەلپ قىلىدىغان كۆرۈنمە يۈز سىستېمىلىرى.
+              </p>
+            </div>
+            <ul class="mt-6 pt-6 border-t border-etblue-500/15 space-y-2 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-etblue-400"></i> ئۆزگىچە ئۇيغۇرچە تىپوگرافىيە</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-etblue-400"></i> ئەپ ۋە توربەت ئۈلگىلىرى</li>
+            </ul>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="glass-card p-8 rounded-3xl flex flex-col justify-between group">
+            <div>
+              <div class="w-14 h-14 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-white transition-all duration-300">
+                <i class="fa-solid fa-code"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mt-6 group-hover:text-cyan-300 transition-colors">تېز تور پىروگراممىسى</h3>
+              <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+                HTML5، Tailwind CSS ھەم React ئارقىلىق ئەڭ تېز سۈرئەتتە ئېچىلىدىغان، بارلىق تېلېفون ۋە كومپيۇتېرلارغا 100% ماس كېلىدىغان كود قۇرۇلمىسى.
+              </p>
+            </div>
+            <ul class="mt-6 pt-6 border-t border-etblue-500/15 space-y-2 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-cyan-300"></i> بارلىق ئېكرانغا تولۇق ماسلىشىش</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-cyan-300"></i> سۈرئىتى 99+ Core Web Vitals</li>
+            </ul>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="glass-card p-8 rounded-3xl flex flex-col justify-between group">
+            <div>
+              <div class="w-14 h-14 rounded-2xl bg-sky-500/15 border border-sky-500/30 text-sky-400 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mt-6 group-hover:text-sky-300 transition-colors">نۇر ۋە كۆركەم ھەرىكەت</h3>
+              <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+                خەرىتە نۇر چېچىش، بەتلەرنىڭ راۋان ئېقىشى، مىكرو ھەرىكەتلەر ھەم نېئون نۇر ئېففېكتلىرى بىلەن تاماشىبىننى قايىل قىلىش.
+              </p>
+            </div>
+            <ul class="mt-6 pt-6 border-t border-etblue-500/15 space-y-2 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-sky-400"></i> كۆركەم نېئون سىزىقلار</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-sky-400"></i> سىلىق ھەرىكەت ئېففېكتى</li>
+            </ul>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="glass-card p-8 rounded-3xl flex flex-col justify-between group">
+            <div>
+              <div class="w-14 h-14 rounded-2xl bg-blue-600/15 border border-blue-600/30 text-blue-400 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <h3 class="text-xl font-bold text-white mt-6 group-hover:text-blue-300 transition-colors">ماركا ئوبرازى</h3>
+              <p class="text-slate-300 text-sm mt-3 leading-relaxed">
+                كارخانا ۋە شىركەتلەر ئۈچۈن خاس بەلگە (Logo)، رەڭ پىلانى، ھۆججەت لايىھەلىرى ۋە رەقەملىك مېدىيا تەمىناتى.
+              </p>
+            </div>
+            <ul class="mt-6 pt-6 border-t border-etblue-500/15 space-y-2 text-xs text-slate-300">
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-400"></i> خاس بەلگە & ئوبراز قېلىپى</li>
+              <li class="flex items-center gap-2"><i class="fa-solid fa-check text-blue-400"></i> يۈكسەك كارخانا سالاپىتى</li>
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SELECTED WORKS / PORTFOLIO (تاللانغان تۈرلەر) -->
+    <section id="portfolio" class="py-24 relative border-t border-etblue-500/15 bg-[#050812]/60">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div>
+            <span class="text-xs font-bold uppercase tracking-widest text-etblue-400">ئىجادىيەت كۆرگەزمىسى</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mt-2">
+              تاللانغان نادىر تۈرلەر
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base mt-2">
+              يېقىندا پۈتتۈرۈلگەن بىر قىسىم يۇقىرى تېخنىكىلىق خېرىدارلار تۈرلىرى ۋە سۇپىلىرى.
+            </p>
+          </div>
+
+          <!-- Project Filter Tabs -->
+          <div class="flex flex-wrap items-center gap-2 p-1.5 rounded-full glass-card border border-etblue-500/25 self-start md:self-auto" id="filterContainer">
+            <button class="filter-btn px-5 py-2 rounded-full text-xs font-bold transition-all bg-etblue-600 text-white shadow-lg shadow-etblue-500/30" data-filter="all">ھەممىسى</button>
+            <button class="filter-btn px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:text-white transition-all" data-filter="web">توربەت</button>
+            <button class="filter-btn px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:text-white transition-all" data-filter="ui">UI/UX</button>
+            <button class="filter-btn px-5 py-2 rounded-full text-xs font-semibold text-slate-300 hover:text-white transition-all" data-filter="app">سۇپا & ئەپ</button>
+          </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" id="projectsGrid">
+          
+          <!-- Project 1 -->
+          <div class="project-item group glass-card rounded-3xl overflow-hidden border border-etblue-500/25" data-category="web">
+            <div class="relative overflow-hidden aspect-[16/10] bg-slate-900">
+              <img 
+                src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" 
+                alt="ئانالىز سۇپىسى" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onerror="this.src='https://placehold.co/800x500/031526/ffffff?text=Turkistan+FinTech'"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#060b17] via-transparent to-transparent opacity-85"></div>
+              <span class="absolute top-4 right-4 glass-badge px-3 py-1 rounded-full text-xs font-bold text-etblue-300">تور سۇپىسى</span>
+            </div>
+            <div class="p-6 text-right">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white group-hover:text-etblue-400 transition-colors">«ئەسر» پۇل-مۇئامىلە باشقۇرۇش سىستېمىسى</h3>
+                <a href="#contact" class="w-8 h-8 rounded-full glass-badge flex items-center justify-center text-slate-200 group-hover:bg-etblue-600 group-hover:text-white transition-all">
+                  <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+              </div>
+              <p class="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed">
+                پۈتۈنلەي ئۇيغۇرچە RTL قوللايدىغان پۇل كۆرسەتكۈچلىرى، جانلىق گىرافىكلار ۋە تېز سۈرئەتلىك بۇلۇت ئۇچۇر باشقۇرۇش كۆرۈنمە يۈزى.
+              </p>
+              <div class="flex items-center gap-2 mt-4 pt-4 border-t border-etblue-500/20 text-xs font-mono text-etblue-300">
+                <span>React</span> &bull; <span>Tailwind CSS</span> &bull; <span>RTL Ready</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 2 -->
+          <div class="project-item group glass-card rounded-3xl overflow-hidden border border-etblue-500/25" data-category="ui">
+            <div class="relative overflow-hidden aspect-[16/10] bg-slate-900">
+              <img 
+                src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=800&q=80" 
+                alt="سۈنئىي ئىدراك خىزمەت بوشلۇقى" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onerror="this.src='https://placehold.co/800x500/031526/ffffff?text=AI+Workspace'"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#060b17] via-transparent to-transparent opacity-85"></div>
+              <span class="absolute top-4 right-4 glass-badge px-3 py-1 rounded-full text-xs font-bold text-cyan-300">UI / UX</span>
+            </div>
+            <div class="p-6 text-right">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white group-hover:text-cyan-300 transition-colors">«تەپەككۇر» سۈنئىي ئىدراك كۆرۈنمە يۈزى</h3>
+                <a href="#contact" class="w-8 h-8 rounded-full glass-badge flex items-center justify-center text-slate-200 group-hover:bg-etblue-600 group-hover:text-white transition-all">
+                  <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+              </div>
+              <p class="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed">
+                ئەقلىي ياردەمچىلەر ئۈچۈن قاراڭغۇ نەپىس لايىھە قېلىپى، زامانىۋى كارتىلار ھەم قولايلىق ئۇچۇر كىرگۈزۈش لايىھە سىستېمىسى.
+              </p>
+              <div class="flex items-center gap-2 mt-4 pt-4 border-t border-etblue-500/20 text-xs font-mono text-cyan-300">
+                <span>Figma Tokens</span> &bull; <span>Dark UI</span> &bull; <span>Micro-interactions</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Project 3 -->
+          <div class="project-item group glass-card rounded-3xl overflow-hidden border border-etblue-500/25" data-category="app">
+            <div class="relative overflow-hidden aspect-[16/10] bg-slate-900">
+              <img 
+                src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=800&q=80" 
+                alt="تەنتەربىيە ۋە تەن سالامەتلىك ئەپچىسى" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                onerror="this.src='https://placehold.co/800x500/031526/ffffff?text=Mobile+App'"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#060b17] via-transparent to-transparent opacity-85"></div>
+              <span class="absolute top-4 right-4 glass-badge px-3 py-1 rounded-full text-xs font-bold text-sky-300">يانفۇن ئەپچىسى</span>
+            </div>
+            <div class="p-6 text-right">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-white group-hover:text-sky-300 transition-colors">«ئىز» ساغلاملىق & قەدەم نازارەتچىسى</h3>
+                <a href="#contact" class="w-8 h-8 rounded-full glass-badge flex items-center justify-center text-slate-200 group-hover:bg-etblue-600 group-hover:text-white transition-all">
+                  <i class="fa-solid fa-arrow-left text-xs"></i>
+                </a>
+              </div>
+              <p class="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed">
+                ئەقلىي سائەت ۋە تېلېفونغا ئۇلىنىپ كۈندىلىك پائالىيەتنى يۇقىرى ئېنىقلىقتا كۆرسىتىپ بېرىدىغان كۆركەم لايىھە ئەپچىسى.
+              </p>
+              <div class="flex items-center gap-2 mt-4 pt-4 border-t border-etblue-500/20 text-xs font-mono text-sky-300">
+                <span>iOS / Android</span> &bull; <span>Glassmorphism</span> &bull; <span>SVG Icons</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CORE SKILLS & TECH (ماھارەت ۋە تېخنىكىلار) -->
+    <section id="skills" class="py-24 relative border-t border-etblue-500/15">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+          <span class="text-xs font-bold uppercase tracking-widest text-etblue-400">تېخنىكا سەۋىيەم</span>
+          <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mt-2">
+            ئىشلىتىدىغان ئاساسلىق قوراللار
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base mt-4">
+            نەزەرىيە ۋە تېخنىكىنى ئەمەلىيەتكە ئەڭ يۇقىرى پىرسەنتتە بىرلەشتۈرۈش ئىقتىدارى.
+          </p>
+        </div>
+
+        <!-- Skills Progress Cards with Blue Gradient Fills -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-etblue-500/20 text-etblue-300 flex items-center justify-center text-xl">
+                  <i class="fa-brands fa-html5"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white">HTML5 & RTL ئۇيغۇرچە قۇرۇلما</h4>
+                  <span class="text-xs text-slate-400">SEO & راۋان ئوقۇلۇش</span>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-etblue-400">99%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 mt-4 overflow-hidden border border-etblue-500/20">
+              <div class="bg-gradient-to-r from-etblue-600 to-sky-400 h-2.5 rounded-full" style="width: 99%;"></div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-xl">
+                  <i class="fa-brands fa-css3-alt"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white">Tailwind CSS & نېئون نۇر ئېففېكتى</h4>
+                  <span class="text-xs text-slate-400">خاس سىزىق ۋە كارتىلار</span>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-cyan-400">96%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 mt-4 overflow-hidden border border-etblue-500/20">
+              <div class="bg-gradient-to-r from-cyan-600 to-blue-400 h-2.5 rounded-full" style="width: 96%;"></div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-xl">
+                  <i class="fa-brands fa-js"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white">JavaScript (ES6+) ئۆز-ئارا تەسىر</h4>
+                  <span class="text-xs text-slate-400">DOM ھەرىكەتلىرى ۋە لوگىكا</span>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-amber-300">94%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 mt-4 overflow-hidden border border-etblue-500/20">
+              <div class="bg-gradient-to-r from-amber-500 to-yellow-300 h-2.5 rounded-full" style="width: 94%;"></div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-300 flex items-center justify-center text-xl">
+                  <i class="fa-brands fa-react"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white">React & Next.js سۇپىلىرى</h4>
+                  <span class="text-xs text-slate-400">زامانىۋى Web ئەپلەر</span>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-sky-400">91%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 mt-4 overflow-hidden border border-etblue-500/20">
+              <div class="bg-gradient-to-r from-sky-600 to-indigo-400 h-2.5 rounded-full" style="width: 91%;"></div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-pink-500/20 text-pink-300 flex items-center justify-center text-xl">
+                  <i class="fa-brands fa-figma"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white">Figma & UI قېلىپ لايىھەسى</h4>
+                  <span class="text-xs text-slate-400">پۈتۈن سىستېمىلىق قۇرۇلما</span>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-pink-400">98%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 mt-4 overflow-hidden border border-etblue-500/20">
+              <div class="bg-gradient-to-r from-pink-500 to-purple-400 h-2.5 rounded-full" style="width: 98%;"></div>
+            </div>
+          </div>
+
+          <div class="glass-card p-6 rounded-2xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-300 flex items-center justify-center text-xl">
+                  <i class="fa-solid fa-draw-polygon"></i>
+                </div>
+                <div>
+                  <h4 class="text-base font-bold text-white">SVG خەرىتە & نۇر ھەرىكەتلىرى</h4>
+                  <span class="text-xs text-slate-400">Laser Tracers & Animations</span>
+                </div>
+              </div>
+              <span class="text-xs font-mono font-bold text-blue-400">92%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 mt-4 overflow-hidden border border-etblue-500/20">
+              <div class="bg-gradient-to-r from-blue-500 to-cyan-400 h-2.5 rounded-full" style="width: 92%;"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION (مەن ھەققىدە) -->
+    <section id="about" class="py-24 relative border-t border-etblue-500/15 bg-[#050812]/70">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div class="lg:col-span-5 relative">
+            <div class="relative mx-auto max-w-sm rounded-3xl p-3 glass-card border border-etblue-500/30">
+              <div class="rounded-2xl overflow-hidden aspect-[4/5] relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=700&q=80" 
+                  alt="ئەلىشىر بايان سۈرىتى" 
+                  class="w-full h-full object-cover filter contrast-110 hover:scale-105 transition-all duration-700"
+                  onerror="this.src='https://placehold.co/700x875/04162e/ffffff?text=Alishir+Bayan'"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-[#04060a] via-transparent to-transparent opacity-70"></div>
+              </div>
+              <div class="mt-4 p-4 rounded-xl glass-badge flex items-center justify-between">
+                <div>
+                  <div class="text-xs text-slate-300">ماكانىم</div>
+                  <div class="text-sm font-bold text-white">شەرقىي تۈركىستان روھى &bull; يەر شارى خاراكتېرلىك ئەركىن لايىھەلىگۈچى</div>
+                </div>
+                <div class="w-9 h-9 rounded-full bg-etblue-500/20 text-etblue-400 flex items-center justify-center">
+                  <i class="fa-solid fa-flag text-sm"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 space-y-6 text-right">
+            <span class="text-xs font-bold uppercase tracking-widest text-etblue-400">پىكىر ۋە نىشان</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+              ھەر بىر نۇقتا ۋە سىزىقتا <br class="hidden sm:block"/>
+              مىللىي سالاپەت ۋە يۇقىرى تېخنىكا.
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              مېنىڭ لايىھە ئىدىيەم پەقەت چىرايلىق بەت ياساش بىلەنلا چەكلەنمەيدۇ. مەن خەلقئارالىق ئالدىنقى قاتاردىكى تېخنىكىلارنى خەلقىمىزنىڭ ئانا تىلى ۋە مەدەنىيىتى بىلەن يۇغۇرۇپ، شەرقىي تۈركىستاننىڭ كۆك بايرىقىدەك سۈزۈك، ئۆزگىچە ۋە كۈچلۈك رەقەملىك ئەسەرلەرنى ۋۇجۇدقا چىقىرىشنى ئۆزۈمگە بۇرچ بىلىمەن.
+            </p>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              كۆك تەگلىك ۋە نېئون نۇر گىرۋەكلىرى بىزنىڭ ئەقىل-پاراسىتىمىزنىڭ ۋە ئۈمىدىمىزنىڭ زامانىۋى دۇنيادا ھەر ۋاقىت پاتپاتلاپ تۇرۇشىنىڭ بەلگىسىدۇر.
+            </p>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4">
+              <div class="p-4 rounded-2xl glass-card border border-etblue-500/25">
+                <div class="text-etblue-400 text-xl mb-1"><i class="fa-solid fa-medal"></i></div>
+                <div class="text-white font-bold text-sm">ئەلا نەتىجە</div>
+                <div class="text-xs text-slate-400">Awwwards تەۋسىيەسى</div>
+              </div>
+              <div class="p-4 rounded-2xl glass-card border border-etblue-500/25">
+                <div class="text-cyan-300 text-xl mb-1"><i class="fa-solid fa-bolt"></i></div>
+                <div class="text-white font-bold text-sm">چاقماق سۈرئەت</div>
+                <div class="text-xs text-slate-400">Core Web Vitals 100</div>
+              </div>
+              <div class="p-4 rounded-2xl glass-card border border-etblue-500/25 col-span-2 sm:col-span-1">
+                <div class="text-sky-400 text-xl mb-1"><i class="fa-solid fa-gem"></i></div>
+                <div class="text-white font-bold text-sm">مۇكەممەللىك</div>
+                <div class="text-xs text-slate-400">نەپىس پىكسېل سۈپىتى</div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CONTACT SECTION (ئالاقىلىشىش) -->
+    <section id="contact" class="py-24 relative border-t border-etblue-500/15">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          <!-- Contact Info -->
+          <div class="lg:col-span-5 space-y-6 text-right">
+            <span class="text-xs font-bold uppercase tracking-widest text-etblue-400">ئالاقە ئورنىتىش</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+              بىرلىكتە نادىر لايىھە يارىتايلى
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              سىزدە بىرەر يېڭى پىكىر، شەخسىي ياكى شىركەت توربېتى، ياكى تۈر لايىھەسى بولسا ھەر ۋاقىت ئۇچۇر قالدۇرۇڭ. بىز سىزنىڭ پىكرىڭىزنى كۆك بايراقتەك يۈكسەك قىلىپ قۇرۇپ چىقىمىز.
+            </p>
+
+            <div class="space-y-4 pt-4">
+              <div class="flex items-center gap-4 glass-card p-4 rounded-2xl border border-etblue-500/25">
+                <div class="w-12 h-12 rounded-xl bg-etblue-500/20 text-etblue-400 flex items-center justify-center text-lg flex-shrink-0">
+                  <i class="fa-regular fa-envelope"></i>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-slate-400">ئېلخەت ئادرېسىم</div>
+                  <a href="mailto:contact@alishirbayan.design" class="text-sm font-bold text-white hover:text-etblue-300 transition-colors font-mono">contact@alishirbayan.design</a>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4 glass-card p-4 rounded-2xl border border-etblue-500/25">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-lg flex-shrink-0">
+                  <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="text-right">
+                  <div class="text-xs text-slate-400">جاۋاب قايتۇرۇش سۈرئىتى</div>
+                  <div class="text-sm font-bold text-white">24 سائەت ئىچىدە تەپسىلىي جاۋاب</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Links -->
+            <div class="pt-4">
+              <div class="text-xs font-bold text-slate-300 mb-3">ئىجتىمائىي مېدىيالار:</div>
+              <div class="flex items-center gap-3">
+                <a href="#" class="w-10 h-10 rounded-xl glass-badge flex items-center justify-center text-slate-200 hover:text-white hover:bg-etblue-600 transition-all">
+                  <i class="fa-brands fa-x-twitter"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-xl glass-badge flex items-center justify-center text-slate-200 hover:text-white hover:bg-etblue-600 transition-all">
+                  <i class="fa-brands fa-github"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-xl glass-badge flex items-center justify-center text-slate-200 hover:text-white hover:bg-etblue-600 transition-all">
+                  <i class="fa-brands fa-linkedin-in"></i>
+                </a>
+                <a href="#" class="w-10 h-10 rounded-xl glass-badge flex items-center justify-center text-slate-200 hover:text-white hover:bg-etblue-600 transition-all">
+                  <i class="fa-brands fa-telegram"></i>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Interactive Contact Form (RTL) -->
+          <div class="lg:col-span-7">
+            <div class="glass-card p-8 sm:p-10 rounded-3xl border border-etblue-500/35 relative">
+              
+              <h3 class="text-2xl font-bold text-white mb-2 text-right">تۈر تەلىپى قالدۇرۇڭ</h3>
+              <p class="text-xs sm:text-sm text-slate-300 mb-8 text-right">ئۇچۇرلىرىڭىزنى تولدۇرسىڭىز، تېز ئارىدا سىز بىلەن ئالاقىلىشىمەن.</p>
+
+              <form id="portfolioContactForm" class="space-y-6 text-right">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <label for="userName" class="block text-xs font-bold text-slate-300 mb-2">ئىسمىڭىز *</label>
+                    <input 
+                      type="text" 
+                      id="userName" 
+                      required 
+                      placeholder="مەسىلەن: بارىن ئەپەندى"
+                      class="w-full px-4 py-3 rounded-xl bg-[#09101f] border border-etblue-500/25 text-white placeholder-slate-500 focus:outline-none focus:border-etblue-400 focus:ring-1 focus:ring-etblue-400 transition-all text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label for="userEmail" class="block text-xs font-bold text-slate-300 mb-2">ئېلخەت ئادرېسىڭىز *</label>
+                    <input 
+                      type="email" 
+                      id="userEmail" 
+                      required 
+                      placeholder="barin@example.com"
+                      class="w-full px-4 py-3 rounded-xl bg-[#09101f] border border-etblue-500/25 text-white placeholder-slate-500 focus:outline-none focus:border-etblue-400 focus:ring-1 focus:ring-etblue-400 transition-all text-sm text-left"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="projectType" class="block text-xs font-bold text-slate-300 mb-2">تۈر تۈرى</label>
+                  <select 
+                    id="projectType"
+                    class="w-full px-4 py-3 rounded-xl bg-[#09101f] border border-etblue-500/25 text-white focus:outline-none focus:border-etblue-400 focus:ring-1 focus:ring-etblue-400 transition-all text-sm"
+                  >
+                    <option value="complete">پۈتۈن توربەت لايىھەسى ۋە قۇرۇلۇشى (Full Stack)</option>
+                    <option value="uiux">UI / UX كۆرۈنمە يۈز قېلىپى (Figma)</option>
+                    <option value="frontend">تېز سۈرئەتلىك ئالدى سەھنە كودى (HTML/Tailwind/React)</option>
+                    <option value="branding">ماركا بەلگىسى (Logo) ۋە ئوبراز لايىھەسى</option>
+                    <option value="advisory">لايىھە ۋە تېخنىكا مەسلىھەتچىلىكى</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="userMessage" class="block text-xs font-bold text-slate-300 mb-2">تۈر ھەققىدە قىسقىچە ئۇچۇر *</label>
+                  <textarea 
+                    id="userMessage" 
+                    rows="4" 
+                    required 
+                    placeholder="تۈرىڭىزنىڭ ئاساسىي مەقسىتى، ۋاقىت مۆھلىتى ۋە باشقا تەلەپلىرىڭىزنى يېزىڭ..."
+                    class="w-full px-4 py-3 rounded-xl bg-[#09101f] border border-etblue-500/25 text-white placeholder-slate-500 focus:outline-none focus:border-etblue-400 focus:ring-1 focus:ring-etblue-400 transition-all text-sm resize-none"
+                  ></textarea>
+                </div>
+
+                <button 
+                  type="submit" 
+                  id="submitBtn"
+                  class="w-full py-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-etblue-600 via-etblue-500 to-sky-400 hover:opacity-95 shadow-xl shadow-etblue-500/35 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span id="btnText">ئۇچۇرنى يوللاش</span>
+                  <i class="fa-solid fa-paper-plane text-xs" id="btnIcon"></i>
+                </button>
+
+              </form>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="py-10 border-t border-etblue-500/20 bg-[#03060c] text-slate-400 text-xs">
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-etblue-500 animate-ping"></span>
+        <span class="text-slate-300 font-bold">ئەلىشىر بايان تەرىپىدىن كۆك بايراقتەك گۈزەل ئۈمىد بىلەن لايىھەلەندى</span>
+      </div>
+      <div class="text-slate-400">
+        &copy; <span id="currentYear"></span> بارلىق ھوقۇق قوغدىلىدۇ. شەرقىي تۈركىستان ئىلھامى.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Submission Toast Notification (RTL) -->
+  <div id="toastNotification" class="fixed bottom-6 left-6 max-w-sm glass-card border border-emerald-400/50 p-4 rounded-2xl flex items-center gap-3 transform translate-y-36 opacity-0 transition-all duration-300 z-50 shadow-2xl text-right">
+    <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <div class="flex-1">
+      <h5 class="text-sm font-bold text-white" id="toastTitle">ئۇچۇرىڭىز تاپشۇرۇلدى</h5>
+      <p class="text-xs text-slate-300" id="toastMessage">تەلىپىڭىز قوبۇل قىلىندى، 24 سائەت ئىچىدە ئالاقىلىشىمەن.</p>
+    </div>
+    <button id="closeToast" class="text-slate-400 hover:text-white p-1 text-xs">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Set current year
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    // Mobile Navigation Drawer Toggle
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const menuIcon = document.getElementById('menuIcon');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      const isHidden = mobileDrawer.classList.contains('hidden');
+      if (isHidden) {
+        mobileDrawer.classList.remove('hidden');
+        menuIcon.classList.replace('fa-bars', 'fa-xmark');
+      } else {
+        mobileDrawer.classList.add('hidden');
+        menuIcon.classList.replace('fa-xmark', 'fa-bars');
+      }
+    });
+
+    mobileLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mobileDrawer.classList.add('hidden');
+        menuIcon.classList.replace('fa-xmark', 'fa-bars');
+      });
+    });
+
+    // Header styling on scroll
+    const header = document.getElementById('mainHeader');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 40) {
+        header.classList.add('py-1', 'shadow-2xl', 'shadow-black/70');
+      } else {
+        header.classList.remove('py-1', 'shadow-2xl', 'shadow-black/70');
+      }
+    });
+
+    // Portfolio Category Filtering
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const projectItems = document.querySelectorAll('.project-item');
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => {
+          b.classList.remove('bg-etblue-600', 'text-white', 'shadow-lg');
+          b.classList.add('text-slate-300');
+        });
+        btn.classList.add('bg-etblue-600', 'text-white', 'shadow-lg');
+        btn.classList.remove('text-slate-300');
+
+        const filterValue = btn.getAttribute('data-filter');
+
+        projectItems.forEach(item => {
+          const category = item.getAttribute('data-category');
+          if (filterValue === 'all' || category === filterValue) {
+            item.style.display = 'block';
+            setTimeout(() => {
+              item.style.opacity = '1';
+              item.style.transform = 'scale(1)';
+            }, 50);
+          } else {
+            item.style.opacity = '0';
+            item.style.transform = 'scale(0.96)';
+            setTimeout(() => {
+              item.style.display = 'none';
+            }, 200);
+          }
+        });
+      });
+    });
+
+    // Contact Form Submission & Toast
+    const form = document.getElementById('portfolioContactForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+    const toast = document.getElementById('toastNotification');
+    const closeToast = document.getElementById('closeToast');
+
+    function showToast(name) {
+      const toastTitle = document.getElementById('toastTitle');
+      const toastMsg = document.getElementById('toastMessage');
+      
+      toastTitle.textContent = `ھۆرمەتلىك ${name}، تەلىپىڭىز تاپشۇرۇلدى!`;
+      toastMsg.textContent = "ئۇچۇرىڭىز خىزمەت دەپتىرىمىزگە كىرگۈزۈلدى، كۆپ رەھمەت!";
+      
+      toast.classList.remove('translate-y-36', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        hideToast();
+      }, 5000);
+    }
+
+    function hideToast() {
+      toast.classList.add('translate-y-36', 'opacity-0');
+      toast.classList.remove('translate-y-0', 'opacity-100');
+    }
+
+    closeToast.addEventListener('click', hideToast);
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const userName = document.getElementById('userName').value.trim();
+
+      // Loading state
+      btnText.textContent = "يوللىنىۋاتىدۇ...";
+      btnIcon.className = "fa-solid fa-spinner fa-spin text-xs";
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        btnText.textContent = "مۇۋەپپەقىيەتلىك ئەۋەتىلدى!";
+        btnIcon.className = "fa-solid fa-check text-xs";
+        
+        showToast(userName);
+        form.reset();
+
+        setTimeout(() => {
+          btnText.textContent = "ئۇچۇرنى يوللاش";
+          btnIcon.className = "fa-solid fa-paper-plane text-xs";
+          submitBtn.disabled = false;
+        }, 2500);
+
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
